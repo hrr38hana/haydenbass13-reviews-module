@@ -124,9 +124,7 @@ class ReviewForm extends React.Component {
     };
     this.handleChange = this.handleChange.bind(this);
   }
-  componentDidMount() {
-    console.log(this.props);
-  }
+
   handleChange(event) {
     let target = event.target;
     let name = target.name;

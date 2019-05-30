@@ -2,6 +2,8 @@ import React from "react";
 import styled from "styled-components";
 import StarRating from "react-star-ratings";
 
+const verified = 'https://cdn0.iconfinder.com/data/icons/social-messaging-ui-color-shapes-3/3/31-512.png';
+
 const ReviewWrapper = styled.div`
   display: flex;
   margin-bottom: 30px;
@@ -99,10 +101,12 @@ const IndividualReviewDetail = ({ review }) => {
               color: "#88D633",
               height: 15,
               width: 15,
-              display: "inline-block"
+              display: "inline-block",
+              backgroundImage: `url(${verified})`,
+              backgroundSize: 'cover'
             }}
           >
-            <svg
+            {/* <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 19 19"
               version="1.1"
@@ -134,7 +138,7 @@ const IndividualReviewDetail = ({ review }) => {
                   </g>
                 </g>
               </g>
-            </svg>{" "}
+            </svg>{" "} */}
           </div>
           <span style={{ display: "inline-block", marginLeft: 5 }}>
             {" "}
