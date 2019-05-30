@@ -1,12 +1,16 @@
 import express from "express";
 import compression from "compression";
 import ssr from "./routes/ssr";
+import bodyParser from 'body-parser'
 const app = express();
 
 app.use(compression());
 app.use(express.static("public"));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use("/firstssr", ssr);
+app.use("/", ssr);
+
 
 const port = process.env.PORT || 3030;
 app.listen(port, function listenHandler() {

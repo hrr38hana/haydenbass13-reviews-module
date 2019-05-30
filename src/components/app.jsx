@@ -1,66 +1,134 @@
-import React from "react";
+import "@babel/polyfill/noConflict";
+import React from 'react';
+import ReactDOM from 'react-dom';
+import $ from 'jquery';
+import styled from 'styled-components';
+import ReviewsCharts from './ReviewsCharts.jsx'
+import ReviewForm from './AddReviewForm.jsx';
+
+
+const backgroundImage =
+  "https://loading.io/spinners/rolling/lg.curve-bars-loading-indicator.gif";
+
+const BigWrapper = styled.div`
+  position: relative;
+  max-width: 1050px;
+  min-width: 970px;
+  left: 50%;
+  transform: translate(-50%);
+`;
+const ReviewWrapper = styled.div`
+// visibility:visible;
+//   &:active{
+//     visibility:visible;
+  }
+`;
 
 class App extends React.Component {
-  constructor() {
-    super();
-    this.handleButtonClick = this.handleButtonClick.bind(this);
-    this.handleTextChange = this.handleTextChange.bind(this);
-    this.handleReset = this.handleReset.bind(this);
-
+  constructor(props) {
+    super(props);
     this.state = {
-      name: "",
-      msg: ""
+      product: Math.floor(Math.random() * 100),
+      reviews: [],
+      rating: 0,
+      isHidden: true,
+      isFiltered: false,
+      filteredStar: null
     };
+    this.addReview = this.addReview.bind(this);
+    this.toggleReviewWindow = this.toggleReviewWindow.bind(this);
+    this.filterReviews = this.filterReviews.bind(this);
+  }
+  async componentWillMount() {
+    await $.get(`/${this.state.product}`).done(results => {
+      this.setState({ reviews: results });
+
+      this.getAverage();
+    });
   }
 
-  //Handlers
-  handleButtonClick = e => {
-    const nameLen = this.state.name.length;
-    if (nameLen > 0) {
-      this.setState({
-        msg: `You name has ${nameLen} characters including space`
-      });
+  componentDidMount() {
+    console.log(this.state);
+  }
+  getAverage() {
+    let total = 0,
+      average;
+    this.state.reviews.forEach(rev => {
+      total += rev.stars;
+    });
+    average = total / this.state.reviews.length;
+    this.setState({ rating: average });
+  }
+  addReview(data) {
+    for (var i in data) {
+      if (
+        i !== "pros" &&
+        i !== "cons" &&
+        i !== "describe_yourself" &&
+        i !== "best_uses" &&
+        data[i] === null
+      ) {
+        alert(`${i} Cannot Be Left Blank`);
+        return;
+      }
     }
-  };
-
-  handleTextChange = e => {
-    this.setState({ name: e.target.value });
-  };
-
-  handleReset = () => {
-    this.setState({ name: "", msg: "" });
-  };
-  //End Handlers
+    $.post(`/${data.product_Id}`, data)
+      .done(async () => {
+        await $.get(`/${this.state.product}`).done(results => {
+          this.setState({ reviews: results, isHidden: true });
+          this.getAverage();
+        });
+      })
+      .catch(err => {
+        alert("Review NOT Posted! : ", err);
+      });
+  }
+  toggleReviewWindow() {
+    this.setState({ isHidden: !this.state.isHidden });
+  }
+  filterReviews(star) {
+    console.log(star);
+    if (this.state.isFiltered === true && this.state.filteredStar === star) {
+      this.setState({ isFiltered: false, filteredStar: null });
+    } else {
+      this.setState({ isFiltered: true, filteredStar: star });
+    }
+  }
 
   render() {
-    let msg;
-
-    if (this.state.msg !== "") {
-      msg = <p>{this.state.msg}</p>;
-    } else {
-      msg = "";
-    }
     return (
-      //do something here where there is a button that will replace the text
       <div>
-        <label>Your name </label>
-        <input
-          type="text"
-          id="txtName"
-          name="txtName"
-          value={this.state.name}
-          onChange={this.handleTextChange}
-        />
-        <button id="btnSubmit" onClick={this.handleButtonClick}>
-          Calculate Name Length
-        </button>
-        <button id="btnReset" onClick={this.handleReset}>
-          Reset All
-        </button>
-        <hr />
-        {msg}
+        {!this.state.isHidden ? (
+          <ReviewWrapper ref="ReviewForm">
+            <ReviewForm
+              product_Id={this.state.product}
+              toggle={this.toggleReviewWindow}
+              post={this.addReview}
+            />
+          </ReviewWrapper>
+        ) : null}
+        {this.state && this.state.reviews.length !== 0 ? (
+          <BigWrapper>
+            <p
+              style={{ fontSize: 30, fontWeight: 800, fontFamily: "Helvetica" }}
+            >
+              Reviews
+            </p>
+            <ReviewsCharts
+              filteredBy={this.state.filteredStar}
+              isFiltered={this.state.isFiltered}
+              barClick={this.filterReviews}
+              reviews={this.state.reviews}
+              rating={this.state.rating}
+              toggle={this.toggleReviewWindow}
+            />
+          </BigWrapper>
+        ) : (
+          <div style={{ backgroundImage: `url(${backgroundImage})` }} />
+        )}
       </div>
     );
   }
 }
+
 export default App;
