@@ -14,7 +14,6 @@ module.exports = {
         )
     },
     post: function(review, callback) {
-      console.log(review)
       db.queryAsync('USE TREK;')
       .then(
         db.queryAsync(

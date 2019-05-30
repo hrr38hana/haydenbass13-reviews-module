@@ -28,8 +28,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      product: Math.floor(Math.random() * 100),
-      reviews: [],
+      reviews: this.props.reviews,
       rating: 0,
       isHidden: true,
       isFiltered: false,
@@ -39,16 +38,9 @@ class App extends React.Component {
     this.toggleReviewWindow = this.toggleReviewWindow.bind(this);
     this.filterReviews = this.filterReviews.bind(this);
   }
-  async componentWillMount() {
-    await $.get(`/${this.state.product}`).done(results => {
-      this.setState({ reviews: results });
-
-      this.getAverage();
-    });
-  }
-
+  
   componentDidMount() {
-    console.log(this.state);
+    this.getAverage();
   }
   getAverage() {
     let total = 0,
@@ -107,7 +99,7 @@ class App extends React.Component {
             />
           </ReviewWrapper>
         ) : null}
-        {this.state && this.state.reviews.length !== 0 ? (
+        {this.state && this.state.reviews ? (
           <BigWrapper>
             <p
               style={{ fontSize: 30, fontWeight: 800, fontFamily: "Helvetica" }}
