@@ -101,7 +101,7 @@ const Container = styled.div`
   background-color: rgba(0, 0, 0, 0.6);
   z-index: 1040;
   display: block;
-  animation: .8s ${fader};
+  animation: 0.8s ${fader};
 `;
 
 class ReviewForm extends React.Component {
@@ -124,9 +124,7 @@ class ReviewForm extends React.Component {
     };
     this.handleChange = this.handleChange.bind(this);
   }
-  componentDidMount() {
-    console.log(this.props);
-  }
+
   handleChange(event) {
     let target = event.target;
     let name = target.name;

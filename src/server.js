@@ -2,8 +2,10 @@ import express from "express";
 import compression from "compression";
 import ssr from "./routes/ssr";
 import bodyParser from 'body-parser'
+import ignoreFavicon from './server/middleware/favicon'
 const app = express();
 
+app.use(ignoreFavicon)
 app.use(compression());
 app.use(express.static("public"));
 app.use(bodyParser.json());

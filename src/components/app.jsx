@@ -1,11 +1,10 @@
 import "@babel/polyfill/noConflict";
-import React from 'react';
-import ReactDOM from 'react-dom';
-import $ from 'jquery';
-import styled from 'styled-components';
-import ReviewsCharts from './ReviewsCharts.jsx'
-import ReviewForm from './AddReviewForm.jsx';
-
+import React from "react";
+import ReactDOM from "react-dom";
+import $ from "jquery";
+import styled from "styled-components";
+import ReviewsCharts from "./ReviewsCharts.jsx";
+import ReviewForm from "./AddReviewForm.jsx";
 
 const backgroundImage =
   "https://loading.io/spinners/rolling/lg.curve-bars-loading-indicator.gif";
@@ -28,8 +27,8 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      product: Math.floor(Math.random() * 100),
-      reviews: [],
+      reviews: this.props.reviews,
+      product: this.props.id,
       rating: 0,
       isHidden: true,
       isFiltered: false,
@@ -39,16 +38,9 @@ class App extends React.Component {
     this.toggleReviewWindow = this.toggleReviewWindow.bind(this);
     this.filterReviews = this.filterReviews.bind(this);
   }
-  async componentWillMount() {
-    await $.get(`/${this.state.product}`).done(results => {
-      this.setState({ reviews: results });
-
-      this.getAverage();
-    });
-  }
 
   componentDidMount() {
-    console.log(this.state);
+    this.getAverage();
   }
   getAverage() {
     let total = 0,
@@ -73,12 +65,7 @@ class App extends React.Component {
       }
     }
     $.post(`/${data.product_Id}`, data)
-      .done(async () => {
-        await $.get(`/${this.state.product}`).done(results => {
-          this.setState({ reviews: results, isHidden: true });
-          this.getAverage();
-        });
-      })
+      .done(location.reload())
       .catch(err => {
         alert("Review NOT Posted! : ", err);
       });
@@ -87,7 +74,6 @@ class App extends React.Component {
     this.setState({ isHidden: !this.state.isHidden });
   }
   filterReviews(star) {
-    console.log(star);
     if (this.state.isFiltered === true && this.state.filteredStar === star) {
       this.setState({ isFiltered: false, filteredStar: null });
     } else {
@@ -107,7 +93,7 @@ class App extends React.Component {
             />
           </ReviewWrapper>
         ) : null}
-        {this.state && this.state.reviews.length !== 0 ? (
+        {this.state && this.state.reviews ? (
           <BigWrapper>
             <p
               style={{ fontSize: 30, fontWeight: 800, fontFamily: "Helvetica" }}
